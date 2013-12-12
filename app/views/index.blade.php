@@ -14,6 +14,6 @@
 	{{ Form::open(array('url' => '/login', 'method' => 'POST')) }}
 		E-mail <input type="text" name="email" /> <br />
 		Contraseña <input type="password" name="password" /> <br />
-		<input type="submit" value="Ingresar" />
+		<input type="submit" value="Ingresar" class="btn" />
 	{{ Form::close() }}
 @stop

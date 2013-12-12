@@ -1,0 +1,79 @@
+Ejecutar composer install 
+Creando la tabla 'users' desde mysql
+create table users(
+	id int primary key AUTO_INCREMENT,
+	email varchar(100) NOT NULL,
+	nick varchar(20) NOT NULL,
+	password varchar(64) NOT NULL
+)
+Para poder empezar a utilizar migraciones, primero debemos instalar la tabla que las administra.	
+	$ php artisan migrate:install   //crea la tabla llamada migrations:
+
+	$ php artisan migrate:make create_users_table
+
+Ahora bien, volviendo a la migración que estábamos realizando, se debió haber creado en la carpeta ‘app/database/migrations’ un archivo que contiene en primer lugar la fecha en cual fue creada esa migración y luego el nombre que le indicamos.
+	// inicio codigo
+	public function up()
+	{
+	    Schema::create('users', function($table) {
+	        $table->increments('id');
+	        $table->string('email', 100);
+	        $table->string('password', 64);
+	        $table->string('nick', 20);
+	    });
+	}
+	 
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
+	    Schema::drop('users');
+	} 
+	// fin code 
+
+Ahora es momento de ejecutar nuestra migración, por lo que debemos escribir:
+	$ php artisan migrate  //Crea la tabla user
+
+ALIMENTANDO LA TABLA ‘USUARIOS’
+A esta opcion de almacenar datos directamente se llama SEEDING.
+*Para generar un seeder debemos ir a la carpeta ‘app/database/seeds’ y crear un archivo llamado UserTableSeeder.php. 
+ 	//ini code
+ 	class UserTableSeeder extends Seeder {
+ 
+	    public function run()
+	    {
+	        $users = [
+	            ['nick' => 'Juan', 'password' => Hash::make('111'), 'email' => 'juan@email.com'],
+	            ['nick' => 'Pedro', 'password' => Hash::make('222'), 'email' => 'pedro@email.com'],
+	            ['nick' => 'Diego', 'password' => Hash::make('333'), 'email' => 'diego@email.com']
+	        ];
+	 
+	        DB::table('users')->insert($users);
+	    }
+ 
+	}
+ 	// fin code
+
+  Si se fijan, en los campos contraseña estamos utilizando la clase Hash y su método make(), el cual automáticamente hashea el texto entregado
+
+*El siguiente paso es ejecutar este seed para nuestra tabla. Para ello, son dos pasos, el primero es indicarla al framework que seeding vamos a realizar, así que debemos abrir el archivo DatabaseSeeder.php - ubicado en la misma carpeta - y dejarlo como se muestra a continuación:
+	//ini code
+	class DatabaseSeeder extends Seeder {
+ 
+	    /**
+	     * Run the database seeds.
+	     *
+	     * @return void
+	     */
+	    public function run()
+	    {
+	        Eloquent::unguard(); //desactive una capa de seguridad al momento de ingresar datos
+	 
+	        $this->call('UserTableSeeder');
+	    }
+	 
+	}
+	//fin code
